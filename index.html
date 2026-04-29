@@ -6,58 +6,41 @@
     <title>Topological Sorting Visualizer</title>
     <meta name="description" content="An interactive web-based learning tool for Topological Sorting using Kahn's Algorithm and DFS.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Ionicons for neat buttons -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <style>
 :root {
-    /* Dynamic Colors - Dark Mode Default */
     --bg-color: #0b0f19;
     --surface-color: rgba(25, 30, 45, 0.6);
     --surface-border: rgba(255, 255, 255, 0.1);
     --text-color: #f1f5f9;
     --text-muted: #94a3b8;
-    
     --primary: #3b82f6;
     --primary-hover: #2563eb;
     --secondary: #8b5cf6;
     --danger: #ef4444;
     --success: #10b981;
     --warning: #f59e0b;
-
-    /* Graph specific */
-    --node-bg: rgba(30, 41, 59, 0.8);
+    --node-bg: rgba(30, 41, 59, 0.9);
     --node-border: rgba(255, 255, 255, 0.2);
     --node-size: 50px;
     --edge-color: #475569;
-    --edge-width: 3px;
-
-    /* Blur & Shadow */
     --blur: 16px;
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-    
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -1px rgba(0,0,0,0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -2px rgba(0,0,0,0.3);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 [data-theme="light"] {
     --bg-color: #f8fafc;
-    --surface-color: rgba(255, 255, 255, 0.7);
-    --surface-border: rgba(0, 0, 0, 0.1);
+    --surface-color: rgba(255,255,255,0.7);
+    --surface-border: rgba(0,0,0,0.1);
     --text-color: #0f172a;
     --text-muted: #64748b;
-    
-    --node-bg: rgba(241, 245, 249, 0.9);
-    --node-border: rgba(0, 0, 0, 0.1);
-    --edge-color: #cbd5e1;
+    --node-bg: rgba(241,245,249,0.9);
+    --node-border: rgba(0,0,0,0.15);
+    --edge-color: #94a3b8;
 }
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
@@ -66,39 +49,11 @@ body {
     height: 100vh;
     display: flex;
 }
+.bg-shape { position: absolute; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.4; }
+.circle-1 { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; }
+.circle-2 { width: 350px; height: 350px; background: var(--secondary); bottom: -100px; right: 20%; }
 
-/* Background gradient blobs */
-.bg-shape {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    z-index: -1;
-    opacity: 0.5;
-}
-.circle-1 {
-    width: 400px;
-    height: 400px;
-    background: var(--primary);
-    top: -100px;
-    left: -100px;
-}
-.circle-2 {
-    width: 350px;
-    height: 350px;
-    background: var(--secondary);
-    bottom: -100px;
-    right: 20%;
-}
-
-.app-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    gap: 20px;
-}
-
-/* Glass panel utility */
+.app-container { display: flex; width: 100%; height: 100%; padding: 20px; gap: 20px; }
 .glass-panel {
     background: var(--surface-color);
     backdrop-filter: blur(var(--blur));
@@ -107,287 +62,145 @@ body {
     border-radius: 16px;
     box-shadow: var(--shadow-lg);
 }
-
-/* Sidebar */
 .sidebar {
     width: 320px;
     display: flex;
     flex-direction: column;
     padding: 24px;
-    gap: 24px;
+    gap: 20px;
     overflow-y: auto;
+    flex-shrink: 0;
     z-index: 10;
 }
-
-header h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-header p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-header {
-    position: relative;
-}
-#theme-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
-
+header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+header p { font-size: 0.82rem; color: var(--text-muted); }
+header { position: relative; }
+#theme-toggle { position: absolute; top: 0; right: 0; }
 .control-group h3 {
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.07em;
     color: var(--text-muted);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    font-weight: 600;
 }
-
 .mt-2 { margin-top: 8px; }
-
 .btn {
     font-family: inherit;
     font-weight: 600;
-    font-size: 0.9rem;
-    padding: 10px 16px;
+    font-size: 0.88rem;
+    padding: 9px 14px;
     border-radius: 8px;
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     transition: var(--transition);
 }
-
-.btn-group {
-    display: flex;
-    gap: 8px;
-}
-
-.btn.primary {
-    background: var(--primary);
-    color: #fff;
-}
-.btn.primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-2px);
-}
-.btn.secondary {
-    background: var(--secondary);
-    color: #fff;
-    flex: 1;
-}
-.btn.danger {
-    background: transparent;
-    color: var(--danger);
-    border: 1px solid var(--danger);
-}
-.btn.danger:hover {
-    background: var(--danger);
-    color: white;
-}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+.btn-group { display: flex; gap: 8px; }
+.btn.primary { background: var(--primary); color: #fff; flex: 1; }
+.btn.primary:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+.btn.secondary { background: var(--secondary); color: #fff; flex: 1; }
+.btn.secondary:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+.btn.danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); flex: 1; }
+.btn.danger:hover:not(:disabled) { background: var(--danger); color: white; }
 .btn.outline {
     background: transparent;
     border: 1px solid var(--surface-border);
     color: var(--text-color);
     flex: 1;
 }
-.btn.outline:hover, .btn.outline.active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
-}
-
+.btn.outline:hover:not(:disabled) { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+.btn.outline.active { background: rgba(59,130,246,0.15); border-color: var(--primary); color: var(--primary); }
 .icon-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    font-size: 1.25rem;
-    cursor: pointer;
-    border-radius: 50%;
-    padding: 8px;
-    transition: var(--transition);
+    background: transparent; border: none;
+    color: var(--text-color); font-size: 1.25rem;
+    cursor: pointer; border-radius: 50%;
+    padding: 8px; transition: var(--transition);
+    display: inline-flex; align-items: center; justify-content: center;
 }
-.icon-btn:hover {
-    background: rgba(255,255,255,0.1);
-}
+.icon-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
 .icon-btn.large {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     background: var(--surface-color);
     border: 1px solid var(--surface-border);
+    padding: 10px;
 }
-.icon-btn.large:hover {
-    background: var(--primary);
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.playback-controls {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-}
+.icon-btn.large:hover:not(:disabled) { background: var(--primary); color: #fff; transform: translateY(-2px); }
+.playback-controls { display: flex; gap: 10px; justify-content: center; }
 .hidden { display: none !important; }
+.radio-group { display: flex; flex-direction: column; gap: 8px; }
+.radio-group label { cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+.speed-control { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
+.speed-control input[type=range] { flex: 1; accent-color: var(--primary); cursor: pointer; }
+.instructions small { color: var(--text-muted); display: block; margin-top: 6px; font-size: 0.8rem; }
+.explanation-box { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 14px; flex-grow: 1; min-height: 80px; }
+.explanation-box h3 { margin-bottom: 8px; }
+#step-explanation { font-size: 0.9rem; line-height: 1.6; color: var(--text-muted); }
+footer small { color: var(--text-muted); font-size: 0.78rem; }
 
-.radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-.radio-group label {
-    cursor: pointer;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.speed-control {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.speed-control input[type=range] {
-    flex: 1;
-    accent-color: var(--primary);
-}
-
-.instructions small {
-    color: var(--text-muted);
-    display: block;
-    margin-top: 8px;
-}
-
-.explanation-box {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    padding: 16px;
-    flex-grow: 1;
-}
-.explanation-box h3 { margin-bottom: 8px;}
-#step-explanation {
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-footer small { color: var(--text-muted); }
-
-/* Main Working Area */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
-    min-width: 0;
-}
-
-.top-panels {
-    display: flex;
-    gap: 20px;
-    height: 120px;
-    flex-shrink: 0;
-}
-
-.datastruct-panel {
-    flex: 1;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-}
-.datastruct-panel h3 {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-}
-
+/* Main */
+.main-content { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.top-panels { display: flex; gap: 16px; height: 110px; flex-shrink: 0; }
+.datastruct-panel { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; }
+.datastruct-panel h3 { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; font-weight: 600; }
 .ds-elements-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    overflow-x: auto;
-    flex: 1;
-    padding-bottom: 8px; /* Scrollbar space */
+    display: flex; gap: 6px; align-items: center;
+    overflow-x: auto; flex: 1;
 }
-.ds-elements-row::-webkit-scrollbar { height: 6px; }
+.ds-elements-row::-webkit-scrollbar { height: 4px; }
 .ds-elements-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
 .ds-node {
-    width: 40px;
-    height: 40px;
+    min-width: 38px; height: 38px;
     background: var(--node-bg);
     border: 1px solid var(--node-border);
     border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.9rem;
     flex-shrink: 0;
-    transition: var(--transition);
-    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 0 8px;
 }
+.ds-node.visited { background: rgba(16,185,129,0.25); border-color: var(--success); color: var(--success); }
 
-/* Canvas */
-.canvas-wrapper {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-}
+/* Canvas area */
+.canvas-wrapper { flex: 1; position: relative; overflow: hidden; }
 
+/* FIX: canvas div fills wrapper, SVG and nodes-container fill it absolutely */
 #graph-canvas {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 100%; height: 100%;
+    position: absolute; top: 0; left: 0;
     cursor: default;
 }
-#graph-canvas.add-edge-mode {
-    cursor: crosshair;
-}
-#graph-canvas.add-node-mode {
-    cursor: copy;
-}
+#graph-canvas.add-edge-mode { cursor: crosshair; }
+#graph-canvas.add-node-mode { cursor: copy; }
 
+/* FIX: SVG must be 100% width/height to cover the canvas */
 #edges-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     pointer-events: none;
+    overflow: visible;
 }
 
 svg line {
     stroke: var(--edge-color);
-    stroke-width: var(--edge-width);
-    transition: stroke 0.3s, stroke-width 0.3s;
+    stroke-width: 2.5;
+    transition: stroke 0.25s, stroke-width 0.25s;
 }
-svg line.active {
-    stroke: var(--primary);
-    stroke-width: 4px;
-}
-svg line.visited {
-    stroke: var(--success);
-}
-svg line.error {
-    stroke: var(--danger);
-    stroke-width: 4px;
-    animation: dash 1s linear infinite;
-    stroke-dasharray: 10;
-}
+svg line.active { stroke: var(--primary); stroke-width: 3.5; }
+svg line.visited { stroke: var(--success); }
+svg line.error { stroke: var(--danger); stroke-width: 3.5; animation: dash 1s linear infinite; stroke-dasharray: 8; }
 
-/* Add Node styles */
 #nodes-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; /* Let clicks pass to canvas if not on node */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
 }
 
 .node {
@@ -397,61 +210,24 @@ svg line.error {
     border: 2px solid var(--node-border);
     border-radius: 50%;
     position: absolute;
-    top: 0;
-    left: 0;
-    margin-left: calc(var(--node-size) / -2);
-    margin-top: calc(var(--node-size) / -2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    /* FIX: Use transform for centering instead of negative margins — more reliable */
+    transform: translate(-50%, -50%);
+    display: flex; align-items: center; justify-content: center;
     color: var(--text-color);
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-weight: 700; font-size: 1rem;
     box-shadow: var(--shadow-md);
-    pointer-events: auto; /* Re-enable pointer events on nodes */
+    pointer-events: auto;
     cursor: grab;
-    transition: transform 0.2s, background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     user-select: none;
-    /* 3D effect potential */
-    transform-style: preserve-3d;
-    perspective: 1000px;
+    transition: background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
 }
-
-.node:active, .node.dragging {
-    cursor: grabbing;
-    transform: scale(1.1);
-    box-shadow: var(--shadow-lg);
-    z-index: 100;
-}
-
-.node:hover {
-    border-color: var(--primary);
-}
-
-.in-degree {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: var(--surface-color);
-    backdrop-filter: blur(6px);
-    border: 1px solid var(--surface-border);
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-}
-
-/* Node animation states */
+.node:hover { border-color: var(--primary); }
+.node.dragging { cursor: grabbing; box-shadow: var(--shadow-lg); z-index: 100; }
 .node.active {
     background-color: var(--primary);
     border-color: var(--primary-hover);
     color: white;
-    transform: scale(1.1) translateZ(20px);
-    box-shadow: 0 0 20px var(--primary);
+    box-shadow: 0 0 18px rgba(59,130,246,0.6);
 }
 .node.visited {
     background-color: var(--success);
@@ -462,1124 +238,957 @@ svg line.error {
     background-color: var(--danger);
     border-color: #b91c1c;
     color: white;
-    animation: shake 0.5s;
-    box-shadow: 0 0 20px var(--danger);
+    animation: shake 0.4s ease-in-out;
+    box-shadow: 0 0 18px rgba(239,68,68,0.6);
 }
-.node.highlight-target {
-    border-color: var(--warning);
-    box-shadow: 0 0 15px var(--warning);
+.node.highlight-target { border-color: var(--warning); box-shadow: 0 0 12px rgba(245,158,11,0.5); }
+
+.in-degree {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: var(--bg-color);
+    border: 1px solid var(--surface-border);
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    font-size: 0.7rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted);
+    font-weight: 600;
+    pointer-events: none;
 }
 
-/* Animations */
 @keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+/* FIX: separate keyframe for ds-node which doesn't have translate transform */
+@keyframes popInEl {
     0% { transform: scale(0.5); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
+.ds-node { animation: popInEl 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
+    0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+    25% { transform: translate(-50%, -50%) translateX(-6px); }
+    75% { transform: translate(-50%, -50%) translateX(6px); }
 }
+@keyframes dash { to { stroke-dashoffset: -16; } }
 
-@keyframes dash {
-    to {
-        stroke-dashoffset: -20;
-    }
-}
-
-/* Toasts */
+/* Toast */
 #toast-container {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
+    position: absolute; bottom: 16px; right: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 1000; pointer-events: none;
 }
 .toast {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    animation: popIn 0.3s ease-out;
+    background: rgba(15, 20, 35, 0.92);
+    color: white; padding: 10px 18px;
+    border-radius: 8px; font-size: 0.85rem;
+    animation: popInEl 0.25s ease-out;
+    border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(10px);
 }
-.toast.error { background: rgba(239, 68, 68, 0.9); }
-.toast.success { background: rgba(16, 185, 129, 0.9); }
+.toast.error { background: rgba(239,68,68,0.9); border-color: transparent; }
+.toast.success { background: rgba(16,185,129,0.85); border-color: transparent; }
 
-/* Responsive Adjustments */
 @media (max-width: 900px) {
     .app-container { flex-direction: column-reverse; padding: 10px; gap: 10px; }
-    .sidebar { width: 100%; flex: 0 0 auto; height: 35vh; }
-    .main-content { flex: 1 1 65vh; }
+    .sidebar { width: 100%; flex: 0 0 auto; max-height: 40vh; }
+    .main-content { flex: 1; }
 }
     </style>
 </head>
 <body>
-    <!-- Background Elements for Glassmorphism Context -->
-    <div class="bg-shape circle-1"></div>
-    <div class="bg-shape circle-2"></div>
+<div class="bg-shape circle-1"></div>
+<div class="bg-shape circle-2"></div>
 
-    <div class="app-container">
-        <!-- Sidebar Controls -->
-        <aside class="sidebar glass-panel">
-            <header>
-                <h1>TopoSort Visualizer</h1>
-                <p>Interactive graph traversal learning tool</p>
-                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
-                    <ion-icon name="moon-outline"></ion-icon>
+<div class="app-container">
+    <aside class="sidebar glass-panel">
+        <header>
+            <h1>TopoSort Visualizer</h1>
+            <p>Interactive graph traversal learning tool</p>
+            <button id="theme-toggle" class="icon-btn" title="Toggle Theme">
+                <ion-icon name="moon-outline"></ion-icon>
+            </button>
+        </header>
+
+        <div class="control-group">
+            <h3>Graph Input</h3>
+            <div class="btn-group">
+                <button id="btn-add-node" class="btn primary">
+                    <ion-icon name="add-circle-outline"></ion-icon> Add Node
                 </button>
-            </header>
-
-            <div class="control-group">
-                <h3>Graph Input</h3>
-                <div class="btn-group">
-                    <button id="btn-add-node" class="btn primary">
-                        <ion-icon name="add-circle-outline"></ion-icon> Add Node
-                    </button>
-                    <button id="btn-add-edge" class="btn outline" title="Click to start adding an edge, then click source and target nodes">
-                        <ion-icon name="git-network-outline"></ion-icon> Add Edge
-                    </button>
-                </div>
-                <div class="btn-group mt-2">
-                    <button id="btn-generate-dag" class="btn secondary">Random DAG</button>
-                    <button id="btn-clear-graph" class="btn danger outline">Clear</button>
-                </div>
-                <div class="instructions">
-                    <small>Draggable nodes! Select 'Add Edge' mode to link them.</small>
-                </div>
+                <button id="btn-add-edge" class="btn outline">
+                    <ion-icon name="git-network-outline"></ion-icon> Add Edge
+                </button>
             </div>
-
-            <div class="control-group">
-                <h3>Algorithm Settings</h3>
-                <div class="radio-group">
-                    <label>
-                        <input type="radio" name="algorithm" value="kahn" checked> Kahn's (BFS)
-                    </label>
-                    <label>
-                        <input type="radio" name="algorithm" value="dfs"> DFS Post-Order
-                    </label>
-                </div>
-                <div class="speed-control mt-2">
-                    <label for="speed-slider">Speed</label>
-                    <input type="range" id="speed-slider" min="1" max="100" value="50">
-                </div>
+            <div class="btn-group mt-2">
+                <button id="btn-generate-dag" class="btn secondary">Random DAG</button>
+                <button id="btn-clear-graph" class="btn danger">Clear</button>
             </div>
-
-            <div class="control-group">
-                <h3>Simulation Controls</h3>
-                <div class="playback-controls">
-                    <button id="btn-play" class="btn icon-btn large" title="Play">
-                        <ion-icon name="play"></ion-icon>
-                    </button>
-                    <button id="btn-pause" class="btn icon-btn large hidden" title="Pause">
-                        <ion-icon name="pause"></ion-icon>
-                    </button>
-                    <button id="btn-step" class="btn icon-btn large" title="Step Forward">
-                        <ion-icon name="play-forward"></ion-icon>
-                    </button>
-                    <button id="btn-reset" class="btn icon-btn large" title="Reset Simulation">
-                        <ion-icon name="refresh"></ion-icon>
-                    </button>
-                </div>
+            <div class="instructions">
+                <small>Drag nodes to rearrange. Use 'Add Edge' to connect them.</small>
             </div>
-            
-            <div class="control-group explanation-box">
-                <h3>Execution Text Panel</h3>
-                <p id="step-explanation">Ready to trace topological sort. Create a graph or generate one, then press play.</p>
-            </div>
-            
-            <footer>
-                <small>Built for interactive learning.</small>
-            </footer>
-        </aside>
+        </div>
 
-        <!-- Main Working Area -->
-        <main class="main-content">
-            <!-- Data Structure Visualizations -->
-            <div class="top-panels">
-                <div class="glass-panel datastruct-panel" id="ds-container">
-                    <h3 id="ds-title">Queue</h3>
-                    <div id="ds-elements" class="ds-elements-row">
-                        <!-- Queue/Stack elements appended here -->
-                    </div>
-                </div>
-                <div class="glass-panel datastruct-panel" id="result-container">
-                    <h3>Result (Topological Order)</h3>
-                    <div id="result-elements" class="ds-elements-row">
-                        <!-- Result nodes appended here -->
-                    </div>
-                </div>
+        <div class="control-group">
+            <h3>Algorithm</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="algorithm" value="kahn" checked> Kahn's Algorithm (BFS)</label>
+                <label><input type="radio" name="algorithm" value="dfs"> DFS Post-Order</label>
             </div>
-
-            <!-- Graph Canvas -->
-            <div class="canvas-wrapper glass-panel">
-                <div id="graph-canvas">
-                    <svg id="edges-container">
-                        <defs>
-                            <!-- Default Edge Marker -->
-                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="var(--edge-color)" class="svg-edge-marker"/>
-                            </marker>
-                            <!-- Active/Highlight Edge Marker -->
-                            <marker id="arrowhead-active" markerWidth="10" markerHeight="7" refX="28" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="var(--primary)" class="svg-edge-marker-active"/>
-                            </marker>
-                        </defs>
-                        <!-- Lines will go here -->
-                    </svg>
-                    <div id="nodes-container">
-                        <!-- Nodes will go here -->
-                    </div>
-                </div>
-                <!-- Interactive Toast Messages -->
-                <div id="toast-container"></div>
+            <div class="speed-control mt-2">
+                <label for="speed-slider" style="white-space:nowrap">Speed</label>
+                <input type="range" id="speed-slider" min="1" max="100" value="50">
             </div>
-        </main>
-    </div>
+        </div>
 
-    <!-- Scripts -->
-    <script>
+        <div class="control-group">
+            <h3>Playback</h3>
+            <div class="playback-controls">
+                <button id="btn-play" class="icon-btn large" title="Play / Resume">
+                    <ion-icon name="play"></ion-icon>
+                </button>
+                <button id="btn-pause" class="icon-btn large hidden" title="Pause">
+                    <ion-icon name="pause"></ion-icon>
+                </button>
+                <button id="btn-step" class="icon-btn large" title="Step Forward">
+                    <ion-icon name="play-forward"></ion-icon>
+                </button>
+                <button id="btn-reset" class="icon-btn large" title="Reset">
+                    <ion-icon name="refresh"></ion-icon>
+                </button>
+            </div>
+        </div>
+
+        <div class="control-group explanation-box">
+            <h3>Step Info</h3>
+            <p id="step-explanation">Create a graph or generate one, then press play to begin.</p>
+        </div>
+
+        <footer><small>Built for interactive learning.</small></footer>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-panels">
+            <div class="glass-panel datastruct-panel">
+                <h3 id="ds-title">Queue</h3>
+                <div id="ds-elements" class="ds-elements-row"></div>
+            </div>
+            <div class="glass-panel datastruct-panel">
+                <h3>Result — Topological Order</h3>
+                <div id="result-elements" class="ds-elements-row"></div>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper glass-panel">
+            <div id="graph-canvas">
+                <svg id="edges-container" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="var(--edge-color)"/>
+                        </marker>
+                        <marker id="arrowhead-active" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="var(--primary)"/>
+                        </marker>
+                        <marker id="arrowhead-visited" markerWidth="10" markerHeight="7"
+                                refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="var(--success)"/>
+                        </marker>
+                    </defs>
+                </svg>
+                <div id="nodes-container"></div>
+            </div>
+            <div id="toast-container"></div>
+        </div>
+    </main>
+</div>
+
+<script>
+/* =====================================================================
+   GRAPH CLASS
+   ===================================================================== */
 class Graph {
     constructor() {
-        this.nodes = new Map(); // id -> { id, label, x, y, element, inDegreeElement }
-        this.edges = []; // { source, target, element }
-        this.adjList = new Map(); // id -> array of target ids
-        this.inDegree = new Map(); // id -> count
-        
+        this.nodes    = new Map(); // id -> { id, label, x, y, element, inDegreeElement }
+        this.edges    = [];        // { source, target, element }
+        this.adjList  = new Map(); // id -> [targetId, ...]
+        this.inDegree = new Map(); // id -> number
+
         this.nodeCounter = 0;
-        this.container = document.getElementById('nodes-container');
+        this.container    = document.getElementById('nodes-container');
         this.svgContainer = document.getElementById('edges-container');
-        this.canvas = document.getElementById('graph-canvas');
-        
-        this.nodeRadius = 25; // Matching var(--node-size) / 2
-        
-        // Interaction state
-        this.dragNode = null;
-        this.isAddingEdge = false;
-        this.edgeSourceNode = null;
-        this.tempEdgeLine = null;
-        
-        this.readonly = false; // Lock interactions during animation
-        
-        this.initInteraction();
+        this.canvas       = document.getElementById('graph-canvas');
+        this.nodeRadius   = 25; // half of --node-size
+
+        this.dragNode      = null;
+        this.dragOffsetX   = 0;
+        this.dragOffsetY   = 0;
+        this.isAddingEdge  = false;
+        this.edgeSourceId  = null;
+        this.tempEdgeLine  = null;
+
+        this.readonly = false;
+        this._initEvents();
     }
 
-    initInteraction() {
-        // Dragging logic for nodes
-        document.addEventListener('mousemove', (e) => this.onMouseMove(e));
-        document.addEventListener('mouseup', () => this.onMouseUp());
-        
-        // Edge creation temp line following mouse
-        this.canvas.addEventListener('mousemove', (e) => {
-            if (this.isAddingEdge && this.edgeSourceNode && this.tempEdgeLine) {
-                const rect = this.canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
-                
-                this.tempEdgeLine.setAttribute('x2', mouseX);
-                this.tempEdgeLine.setAttribute('y2', mouseY);
-            }
+    _initEvents() {
+        // Global mouse move / up for drag
+        document.addEventListener('mousemove', e => this._onMouseMove(e));
+        document.addEventListener('mouseup',   () => this._onMouseUp());
+
+        // Track mouse on canvas to update temp edge line
+        this.canvas.addEventListener('mousemove', e => {
+            if (!this.isAddingEdge || !this.edgeSourceId || !this.tempEdgeLine) return;
+            const { x, y } = this._canvasPos(e);
+            this.tempEdgeLine.setAttribute('x2', x);
+            this.tempEdgeLine.setAttribute('y2', y);
         });
     }
 
+    /* ---- Position helper ---- */
+    _canvasPos(e) {
+        const r = this.canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    /* ---- Node creation ---- */
     addNode(x, y, label = null) {
-        if (this.readonly) return;
-        
+        if (this.readonly) return null;
+
         const id = `n${this.nodeCounter++}`;
-        if (!label) {
-            // Generate label A, B, C... Z, AA, AB
-            label = this.generateLabel(this.nodeCounter - 1);
-        }
-        
-        const nodeEl = document.createElement('div');
-        nodeEl.className = 'node';
-        nodeEl.id = id;
-        nodeEl.style.left = `${x}px`;
-        nodeEl.style.top = `${y}px`;
-        nodeEl.textContent = label;
-        
+        label = label || this._genLabel(this.nodeCounter - 1);
+
+        const el = document.createElement('div');
+        el.className = 'node';
+        el.id = id;
+        // FIX: position is the centre point; CSS transform handles the visual centering
+        el.style.left = `${x}px`;
+        el.style.top  = `${y}px`;
+        el.textContent = label;
+
         const inDegEl = document.createElement('div');
         inDegEl.className = 'in-degree';
         inDegEl.textContent = '0';
-        nodeEl.appendChild(inDegEl);
-        
-        // Events
-        nodeEl.addEventListener('mousedown', (e) => this.onNodeMouseDown(e, id));
-        nodeEl.addEventListener('mouseenter', () => this.onNodeMouseEnter(id));
-        nodeEl.addEventListener('mouseleave', () => this.onNodeMouseLeave(id));
+        el.appendChild(inDegEl);
 
-        this.container.appendChild(nodeEl);
-        
-        this.nodes.set(id, { id, label, x, y, element: nodeEl, inDegreeElement: inDegEl });
+        el.addEventListener('mousedown', e => this._onNodeMouseDown(e, id));
+        el.addEventListener('mouseenter', () => this._onNodeEnter(id));
+        el.addEventListener('mouseleave', () => this._onNodeLeave(id));
+
+        this.container.appendChild(el);
+        this.nodes.set(id, { id, label, x, y, element: el, inDegreeElement: inDegEl });
         this.adjList.set(id, []);
         this.inDegree.set(id, 0);
-        
         return id;
     }
 
-    generateLabel(index) {
-        let label = '';
-        let temp = index;
+    _genLabel(index) {
+        let label = '', tmp = index;
         do {
-            label = String.fromCharCode(65 + (temp % 26)) + label;
-            temp = Math.floor(temp / 26) - 1;
-        } while (temp >= 0);
+            label = String.fromCharCode(65 + (tmp % 26)) + label;
+            tmp = Math.floor(tmp / 26) - 1;
+        } while (tmp >= 0);
         return label;
     }
 
-    addEdge(sourceId, targetId) {
-        if (this.readonly || sourceId === targetId) return false;
-        
-        // Check if edge already exists
-        if (this.adjList.get(sourceId).includes(targetId)) return false;
-        
-        this.adjList.get(sourceId).push(targetId);
-        this.inDegree.set(targetId, this.inDegree.get(targetId) + 1);
-        
-        const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        lineElement.setAttribute("marker-end", "url(#arrowhead)");
-        this.svgContainer.appendChild(lineElement);
-        
-        const edge = { source: sourceId, target: targetId, element: lineElement };
+    /* ---- Edge creation ---- */
+    addEdge(srcId, tgtId) {
+        if (this.readonly) return false;
+        if (srcId === tgtId) return false;
+        if (this.adjList.get(srcId).includes(tgtId)) return false;
+
+        this.adjList.get(srcId).push(tgtId);
+        this.inDegree.set(tgtId, (this.inDegree.get(tgtId) || 0) + 1);
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('marker-end', 'url(#arrowhead)');
+        this.svgContainer.appendChild(line);
+
+        const edge = { source: srcId, target: tgtId, element: line };
         this.edges.push(edge);
-        
-        this.updateNodeDisplays();
-        this.updateEdges();
-        
+
+        this._updateAllEdges();
+        this._updateInDegreeDisplays();
         return true;
     }
 
-    removeNode(id) {
-        if (this.readonly) return;
-        
-        // Remove connected edges
-        this.edges = this.edges.filter(edge => {
-            if (edge.source === id || edge.target === id) {
-                this.svgContainer.removeChild(edge.element);
-                if (edge.target === id) {
-                    this.inDegree.set(edge.target, this.inDegree.get(edge.target) - 1);
-                }
-                return false;
-            }
-            return true;
-        });
-        
-        this.adjList.delete(id);
-        for (let [source, targets] of this.adjList.entries()) {
-            this.adjList.set(source, targets.filter(t => t !== id));
-        }
-        
-        const node = this.nodes.get(id);
-        this.container.removeChild(node.element);
-        this.nodes.delete(id);
-        this.inDegree.delete(id);
-        
-        this.updateNodeDisplays();
-    }
-
+    /* ---- Clear ---- */
     clear() {
         if (this.readonly) return;
         this.nodes.forEach(n => this.container.removeChild(n.element));
         this.edges.forEach(e => this.svgContainer.removeChild(e.element));
-        if (this.tempEdgeLine && this.tempEdgeLine.parentNode) {
-            this.svgContainer.removeChild(this.tempEdgeLine);
-        }
-        
+        this._removeTempLine();
+
         this.nodes.clear();
         this.edges = [];
         this.adjList.clear();
         this.inDegree.clear();
         this.nodeCounter = 0;
-        this.edgeSourceNode = null;
-        this.tempEdgeLine = null;
+        this.edgeSourceId = null;
     }
 
-    // --- Interaction Handlers ---
-
-    onNodeMouseDown(e, id) {
+    /* ---- Interaction handlers ---- */
+    _onNodeMouseDown(e, id) {
         if (this.readonly) return;
-        
+        e.stopPropagation();
+
         if (this.isAddingEdge) {
-            e.stopPropagation();
-            if (!this.edgeSourceNode) {
-                // First click
-                this.edgeSourceNode = id;
+            if (!this.edgeSourceId) {
+                // First click: select source
+                this.edgeSourceId = id;
                 this.nodes.get(id).element.classList.add('highlight-target');
-                
-                // Create temp line
-                this.tempEdgeLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                this.tempEdgeLine.setAttribute("stroke", "var(--edge-color)");
-                this.tempEdgeLine.setAttribute("stroke-width", "2");
-                this.tempEdgeLine.setAttribute("stroke-dasharray", "5,5");
-                
+
                 const node = this.nodes.get(id);
+                this.tempEdgeLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                this.tempEdgeLine.setAttribute('stroke', 'var(--primary)');
+                this.tempEdgeLine.setAttribute('stroke-width', '2');
+                this.tempEdgeLine.setAttribute('stroke-dasharray', '6,4');
+                this.tempEdgeLine.setAttribute('opacity', '0.7');
                 this.tempEdgeLine.setAttribute('x1', node.x);
                 this.tempEdgeLine.setAttribute('y1', node.y);
                 this.tempEdgeLine.setAttribute('x2', node.x);
                 this.tempEdgeLine.setAttribute('y2', node.y);
                 this.svgContainer.appendChild(this.tempEdgeLine);
             } else {
-                // Second click
-                if (this.edgeSourceNode !== id) {
-                    if (!this.addEdge(this.edgeSourceNode, id)) {
-                        // Edge might exist or something else
-                    }
+                // Second click: connect
+                if (id !== this.edgeSourceId) {
+                    const ok = this.addEdge(this.edgeSourceId, id);
+                    if (!ok) showToast('Edge already exists or invalid.', 'error');
                 }
-                this.nodes.get(this.edgeSourceNode).element.classList.remove('highlight-target');
-                this.edgeSourceNode = null;
-                if (this.tempEdgeLine) {
-                    this.svgContainer.removeChild(this.tempEdgeLine);
-                    this.tempEdgeLine = null;
-                }
+                this.nodes.get(this.edgeSourceId).element.classList.remove('highlight-target');
+                this._removeTempLine();
+                this.edgeSourceId = null;
             }
         } else {
-            // Start Dragging
+            // Begin drag
             this.dragNode = id;
-            this.nodes.get(id).element.classList.add('dragging');
+            const node = this.nodes.get(id);
+            const pos  = this._canvasPos(e);
+            this.dragOffsetX = pos.x - node.x;
+            this.dragOffsetY = pos.y - node.y;
+            node.element.classList.add('dragging');
         }
     }
 
-    onMouseMove(e) {
-        if (this.dragNode && !this.readonly) {
-            const rect = this.canvas.getBoundingClientRect();
-            // Snap to container bounds roughly
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
-            
-            x = Math.max(30, Math.min(x, rect.width - 30));
-            y = Math.max(30, Math.min(y, rect.height - 30));
-            
-            const node = this.nodes.get(this.dragNode);
-            node.x = x;
-            node.y = y;
-            node.element.style.left = `${x}px`;
-            node.element.style.top = `${y}px`;
-            
-            this.updateEdges();
-        }
+    _onMouseMove(e) {
+        if (!this.dragNode || this.readonly) return;
+        const rect = this.canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left - this.dragOffsetX + (this.dragOffsetX); // cancels
+        // FIX: correct drag — track actual canvas position
+        x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+
+        // Clamp inside canvas
+        x = Math.max(this.nodeRadius, Math.min(x, rect.width  - this.nodeRadius));
+        y = Math.max(this.nodeRadius, Math.min(y, rect.height - this.nodeRadius));
+
+        const node = this.nodes.get(this.dragNode);
+        node.x = x; node.y = y;
+        node.element.style.left = `${x}px`;
+        node.element.style.top  = `${y}px`;
+        this._updateAllEdges();
     }
 
-    onMouseUp() {
+    _onMouseUp() {
         if (this.dragNode) {
             this.nodes.get(this.dragNode).element.classList.remove('dragging');
             this.dragNode = null;
         }
     }
-    
-    onNodeMouseEnter(id) {
-        if (this.isAddingEdge && this.edgeSourceNode && this.edgeSourceNode !== id) {
-             this.nodes.get(id).element.classList.add('highlight-target');
+
+    _onNodeEnter(id) {
+        if (this.isAddingEdge && this.edgeSourceId && this.edgeSourceId !== id) {
+            this.nodes.get(id).element.classList.add('highlight-target');
         }
     }
-    
-    onNodeMouseLeave(id) {
-        if (this.isAddingEdge && this.edgeSourceNode !== id) {
-             this.nodes.get(id).element.classList.remove('highlight-target');
+    _onNodeLeave(id) {
+        if (this.isAddingEdge && this.edgeSourceId !== id) {
+            this.nodes.get(id).element.classList.remove('highlight-target');
         }
     }
 
-    cancelEdgeAddition() {
-        if (this.edgeSourceNode) {
-            this.nodes.get(this.edgeSourceNode).element.classList.remove('highlight-target');
+    cancelEdgeMode() {
+        if (this.edgeSourceId) {
+            this.nodes.get(this.edgeSourceId).element.classList.remove('highlight-target');
+            this.edgeSourceId = null;
         }
-         if (this.tempEdgeLine && this.tempEdgeLine.parentNode) {
+        this._removeTempLine();
+    }
+
+    setEdgeMode(on) {
+        this.isAddingEdge = on;
+        if (!on) this.cancelEdgeMode();
+    }
+
+    _removeTempLine() {
+        if (this.tempEdgeLine && this.tempEdgeLine.parentNode) {
             this.svgContainer.removeChild(this.tempEdgeLine);
         }
-        this.edgeSourceNode = null;
         this.tempEdgeLine = null;
     }
 
-    setEdgeMode(isEdgeMode) {
-        this.isAddingEdge = isEdgeMode;
-        if (!isEdgeMode) {
-            this.cancelEdgeAddition();
-        }
+    /* ---- Rendering ---- */
+    _updateAllEdges() {
+        this.edges.forEach(edge => this._positionEdge(edge));
     }
 
-    // --- Rendering Updates ---
+    _positionEdge(edge) {
+        const src = this.nodes.get(edge.source);
+        const tgt = this.nodes.get(edge.target);
+        if (!src || !tgt) return;
 
-    updateEdges() {
-        this.edges.forEach(edge => {
-            const source = this.nodes.get(edge.source);
-            const target = this.nodes.get(edge.target);
-            
-            // Calculate intersection with circle boundary
-            const dx = target.x - source.x;
-            const dy = target.y - source.y;
-            const angle = Math.atan2(dy, dx);
-            
-            // Start edge at circle boundary
-            const startX = source.x + this.nodeRadius * Math.cos(angle);
-            const startY = source.y + this.nodeRadius * Math.sin(angle);
-            
-            // End edge at circle boundary (account for arrow marker size as well, ~10px)
-            const arrowSize = 12;
-            const endX = target.x - (this.nodeRadius + arrowSize) * Math.cos(angle);
-            const endY = target.y - (this.nodeRadius + arrowSize) * Math.sin(angle);
-            
-            edge.element.setAttribute('x1', startX);
-            edge.element.setAttribute('y1', startY);
-            edge.element.setAttribute('x2', endX);
-            edge.element.setAttribute('y2', endY);
+        const dx = tgt.x - src.x, dy = tgt.y - src.y;
+        const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const ux = dx / dist, uy = dy / dist;
+
+        // FIX: correct refX for arrow: line ends before arrowhead tip
+        const arrowLen = 12;
+        const x1 = src.x + ux * this.nodeRadius;
+        const y1 = src.y + uy * this.nodeRadius;
+        const x2 = tgt.x - ux * (this.nodeRadius + arrowLen);
+        const y2 = tgt.y - uy * (this.nodeRadius + arrowLen);
+
+        edge.element.setAttribute('x1', x1);
+        edge.element.setAttribute('y1', y1);
+        edge.element.setAttribute('x2', x2);
+        edge.element.setAttribute('y2', y2);
+    }
+
+    _updateInDegreeDisplays() {
+        this.nodes.forEach((node, id) => {
+            node.inDegreeElement.textContent = this.inDegree.get(id) ?? 0;
         });
     }
 
-    updateNodeDisplays() {
-        this.nodes.forEach(node => {
-            node.inDegreeElement.textContent = this.inDegree.get(node.id) || "0";
-        });
-    }
-
-    // --- State Access for Algorithms ---
+    /* ---- State snapshot for algorithms ---- */
     getGraphState() {
-        // Deep copy of structural data required for algorithms to run without mutating original
         const adj = new Map();
-        for (const [k, v] of this.adjList.entries()) {
-            adj.set(k, [...v]);
-        }
-        const inDeg = new Map(this.inDegree);
-        const nodeIds = Array.from(this.nodes.keys());
-        return { adjList: adj, inDegree: inDeg, nodes: nodeIds, labels: new Map(Array.from(this.nodes.entries()).map(([k,v]) => [k, v.label])) };
+        for (const [k, v] of this.adjList) adj.set(k, [...v]);
+        return {
+            adjList:  adj,
+            inDegree: new Map(this.inDegree),
+            nodes:    Array.from(this.nodes.keys()),
+            labels:   new Map(Array.from(this.nodes.entries()).map(([k, v]) => [k, v.label]))
+        };
     }
 
-    // --- Graph Generation ---
-    generateRandomDAG(numNodes = 8) {
+    /* ---- Random DAG generation ---- */
+    generateRandomDAG(numNodes = 7) {
         this.clear();
-        const rect = this.canvas.getBoundingClientRect();
-        const width = rect.width || 800;
-        const height = rect.height || 600;
-        
-        // Generate nodes in topological layers to ensure DAG
-        const layers = 3;
-        const nodesIds = [];
-        
-        for (let i = 0; i < numNodes; i++) {
-            const layer = i % layers; // Distribute across layers
-            const xOffset = (width / (layers + 1)) * (layer + 1);
-            const randomY = 50 + Math.random() * (height - 100);
-            const randomX = xOffset + (Math.random() * 40 - 20); // Add jitter
-            
-            nodesIds.push(this.addNode(randomX, randomY));
-        }
-        
-        // Create edges strictly from layer i to layer j where j > i
-        for (let i = 0; i < nodesIds.length; i++) {
-            const sourceLayer = i % layers;
-            for (let j = i + 1; j < nodesIds.length; j++) {
-                const targetLayer = j % layers;
-                if (targetLayer > sourceLayer && Math.random() > 0.4) {
-                    this.addEdge(nodesIds[i], nodesIds[j]);
+
+        // FIX: defer layout until canvas has real dimensions
+        requestAnimationFrame(() => {
+            const rect   = this.canvas.getBoundingClientRect();
+            const W      = rect.width  || 700;
+            const H      = rect.height || 500;
+            const layers = Math.ceil(numNodes / 3);
+            const ids    = [];
+
+            // Spread nodes across vertical layers (left → right)
+            for (let i = 0; i < numNodes; i++) {
+                const layer   = Math.floor(i / Math.ceil(numNodes / layers));
+                const layerN  = Math.ceil(numNodes / layers);
+                const posInL  = i % layerN;
+                const totalL  = Math.min(layerN, numNodes - layer * layerN);
+
+                const x = 80 + (layer / (layers - 1 || 1)) * (W - 160) + (Math.random() - 0.5) * 30;
+                const y = 60 + (posInL + 0.5) / totalL * (H - 120) + (Math.random() - 0.5) * 20;
+
+                ids.push(this.addNode(
+                    Math.max(this.nodeRadius + 5, Math.min(x, W - this.nodeRadius - 5)),
+                    Math.max(this.nodeRadius + 5, Math.min(y, H - this.nodeRadius - 5))
+                ));
+            }
+
+            // FIX: guarantee DAG by only adding edges from lower index to higher index
+            for (let i = 0; i < ids.length; i++) {
+                for (let j = i + 1; j < ids.length; j++) {
+                    if (Math.random() < 0.38) {
+                        this.addEdge(ids[i], ids[j]);
+                    }
                 }
             }
-        }
-        this.updateEdges();
+
+            // Ensure every node has at least one connection
+            for (let i = 0; i < ids.length - 1; i++) {
+                const hasOut = this.adjList.get(ids[i]).length > 0;
+                const hasIn  = this.inDegree.get(ids[i + 1]) > 0;
+                if (!hasOut && !hasIn) this.addEdge(ids[i], ids[i + 1]);
+            }
+
+            this._updateAllEdges();
+        });
     }
 }
 
-// Make globally available
-window.Graph = Graph;
-
+/* =====================================================================
+   ALGORITHMS
+   ===================================================================== */
 class Algorithms {
-    
-    // Returns an array of frames representing the animation steps
+
     static runKahns(graphState) {
-        const frames = [];
         const { adjList, inDegree, nodes, labels } = graphState;
-        
-        let q = [];
-        let result = [];
-        let currentInDegree = new Map(inDegree);
-        
+        const frames = [];
+        const curDeg = new Map(inDegree);
+        let queue = [], result = [];
+
         frames.push({
             type: 'INIT',
-            text: "Starting Kahn's Algorithm (BFS). Identifying all nodes with an initial in-degree of 0.",
-            queue: [...q],
-            result: [...result],
-            inDegrees: new Map(currentInDegree)
+            text: "Kahn's Algorithm started. Find all nodes with in-degree 0 to seed the queue.",
+            queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
         });
 
-        // Find initial 0 in-degree nodes
-        for (const node of nodes) {
-            if (currentInDegree.get(node) === 0) {
-                q.push(node);
+        for (const n of nodes) {
+            if (curDeg.get(n) === 0) {
+                queue.push(n);
                 frames.push({
-                    type: 'ENQUEUE',
-                    node: node,
-                    text: `Node ${labels.get(node)} has 0 dependencies (in-degree = 0). Adding it to the queue.`,
-                    queue: [...q],
-                    result: [...result],
-                    inDegrees: new Map(currentInDegree)
+                    type: 'ENQUEUE', node: n,
+                    text: `Node ${labels.get(n)} has in-degree 0 — no prerequisites. Enqueuing it.`,
+                    queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
                 });
             }
         }
 
-        let processedCount = 0;
-
-        while (q.length > 0) {
-            // Dequeue
-            const u = q.shift();
+        while (queue.length > 0) {
+            const u = queue.shift();
             result.push(u);
-            processedCount++;
-            
+
             frames.push({
-                type: 'PROCESS_NODE',
-                node: u,
-                text: `Dequeued Node ${labels.get(u)}. Adding it to the topological sort result. Now exploring its neighbors.`,
-                queue: [...q],
-                result: [...result],
-                inDegrees: new Map(currentInDegree)
+                type: 'PROCESS_NODE', node: u,
+                text: `Dequeued ${labels.get(u)}. Added to result. Now reducing in-degrees of its neighbours.`,
+                queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
             });
 
-            // Iterate neighbors
-            const neighbors = adjList.get(u) || [];
-            if (neighbors.length > 0) {
-                for (const v of neighbors) {
-                    const oldDeg = currentInDegree.get(v);
-                    currentInDegree.set(v, oldDeg - 1);
-                    
+            const nbrs = adjList.get(u) || [];
+            if (nbrs.length === 0) {
+                frames.push({
+                    type: 'NO_NEIGHBORS', node: u,
+                    text: `${labels.get(u)} has no outgoing edges.`,
+                    queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
+                });
+            }
+            for (const v of nbrs) {
+                curDeg.set(v, curDeg.get(v) - 1);
+                frames.push({
+                    type: 'DECREMENT_EDGE', source: u, target: v,
+                    text: `Edge ${labels.get(u)} → ${labels.get(v)} removed. In-degree of ${labels.get(v)} is now ${curDeg.get(v)}.`,
+                    queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
+                });
+                if (curDeg.get(v) === 0) {
+                    queue.push(v);
                     frames.push({
-                        type: 'DECREMENT_EDGE',
-                        source: u,
-                        target: v,
-                        text: `Removing edge from ${labels.get(u)} to ${labels.get(v)}. In-degree of ${labels.get(v)} becomes ${currentInDegree.get(v)}.`,
-                        queue: [...q],
-                        result: [...result],
-                        inDegrees: new Map(currentInDegree)
+                        type: 'ENQUEUE', node: v,
+                        text: `In-degree of ${labels.get(v)} reached 0. Enqueuing it.`,
+                        queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
                     });
-
-                    if (currentInDegree.get(v) === 0) {
-                        q.push(v);
-                        frames.push({
-                            type: 'ENQUEUE',
-                            node: v,
-                            text: `In-degree of ${labels.get(v)} is now 0! Adding it to the queue.`,
-                            queue: [...q],
-                            result: [...result],
-                            inDegrees: new Map(currentInDegree)
-                        });
-                    }
                 }
-            } else {
-                 frames.push({
-                        type: 'NO_NEIGHBORS',
-                        node: u,
-                        text: `Node ${labels.get(u)} has no outgoing edges left to process.`,
-                        queue: [...q],
-                        result: [...result],
-                        inDegrees: new Map(currentInDegree)
-                    });
             }
         }
 
-        // Cycle Detection Check
-        if (processedCount !== nodes.length) {
-            // Find nodes that were not processed (part of cycle)
+        if (result.length !== nodes.length) {
             const cycleNodes = nodes.filter(n => !result.includes(n));
             frames.push({
-                type: 'CYCLE_ERROR',
-                nodes: cycleNodes,
-                text: `⚠️ CYCLE DETECTED! Unable to process all nodes. A valid Topological Sort is not possible. The highlighted nodes form a cycle.`,
-                queue: [...q],
-                result: [...result],
-                inDegrees: new Map(currentInDegree)
+                type: 'CYCLE_ERROR', nodes: cycleNodes,
+                text: `⚠️ Cycle detected! ${cycleNodes.map(n => labels.get(n)).join(', ')} could not be processed. Topological sort impossible.`,
+                queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
             });
         } else {
             frames.push({
                 type: 'DONE',
-                text: `Algorithm finished successfully. All nodes have been processed. The array shows a valid topological ordering.`,
-                queue: [...q],
-                result: [...result],
-                inDegrees: new Map(currentInDegree)
+                text: `✅ Done! Topological order: ${result.map(n => labels.get(n)).join(' → ')}`,
+                queue: [...queue], result: [...result], inDegrees: new Map(curDeg)
             });
         }
-
         return frames;
     }
 
     static runDFS(graphState) {
-        const frames = [];
         const { adjList, nodes, labels } = graphState;
-        
-        const visited = new Set();
-        const visiting = new Set(); // For cycle detection
-        const stack = []; // To store topological order internally
+        const frames = [];
+        const visited  = new Set();
+        const visiting = new Set();
+        const stack    = [];
         let cycleDetected = false;
-        let cycleNodes = [];
 
         frames.push({
             type: 'INIT',
-            text: "Starting DFS-based Topological Sort. We will visit nodes recursively and push to stack upon finishing.",
-            stack: [...stack],
-            visited: Array.from(visited)
+            text: 'DFS Topological Sort started. Nodes are pushed onto the stack after all descendants are explored (post-order).',
+            stack: [...stack], visited: [], visiting: []
         });
 
         const dfs = (u) => {
             if (cycleDetected) return;
-
             visiting.add(u);
             frames.push({
-                type: 'VISIT_NODE',
-                node: u,
-                text: `Visiting node ${labels.get(u)}. Marking as "currently exploring".`,
-                stack: [...stack],
-                visited: Array.from(visited),
-                visiting: Array.from(visiting)
+                type: 'VISIT_NODE', node: u,
+                text: `Visiting ${labels.get(u)} — marked as "in progress".`,
+                stack: [...stack], visited: [...visited], visiting: [...visiting]
             });
 
-            const neighbors = adjList.get(u) || [];
-            for (const v of neighbors) {
+            for (const v of (adjList.get(u) || [])) {
                 if (cycleDetected) break;
-
                 frames.push({
-                    type: 'CHECK_EDGE',
-                    source: u,
-                    target: v,
-                    text: `Checking directed edge from ${labels.get(u)} to ${labels.get(v)}.`,
-                    stack: [...stack],
-                    visited: Array.from(visited),
-                    visiting: Array.from(visiting)
+                    type: 'CHECK_EDGE', source: u, target: v,
+                    text: `Checking edge ${labels.get(u)} → ${labels.get(v)}.`,
+                    stack: [...stack], visited: [...visited], visiting: [...visiting]
                 });
-
                 if (visiting.has(v)) {
                     cycleDetected = true;
-                    cycleNodes = [u, v]; // Simplified cycle highlight
                     frames.push({
-                        type: 'CYCLE_ERROR',
-                        nodes: Array.from(visiting),
-                        text: `⚠️ CYCLE DETECTED! Back-edge found from ${labels.get(u)} to ${labels.get(v)}. Topological sorting not possible.`,
-                        stack: [...stack],
-                        visited: Array.from(visited),
-                        visiting: Array.from(visiting)
+                        type: 'CYCLE_ERROR', nodes: [...visiting],
+                        text: `⚠️ Back edge ${labels.get(u)} → ${labels.get(v)} found! Cycle detected — topological sort impossible.`,
+                        stack: [...stack], visited: [...visited], visiting: [...visiting]
                     });
                     return;
-                } else if (!visited.has(v)) {
-                    dfs(v);
                 }
+                if (!visited.has(v)) dfs(v);
             }
-
             if (cycleDetected) return;
 
             visiting.delete(u);
             visited.add(u);
-            stack.push(u); // Push happens POST-order!
-
+            stack.push(u);
             frames.push({
-                type: 'PUSH_STACK',
-                node: u,
-                text: `Finished exploring all descendants of ${labels.get(u)}. Pushing ${labels.get(u)} to the Stack (Post-order operation).`,
-                stack: [...stack],
-                visited: Array.from(visited),
-                visiting: Array.from(visiting)
+                type: 'PUSH_STACK', node: u,
+                text: `All descendants of ${labels.get(u)} explored. Pushing ${labels.get(u)} onto the stack.`,
+                stack: [...stack], visited: [...visited], visiting: [...visiting]
             });
         };
 
-        for (const node of nodes) {
-            if (cycleDetected) break;
-            if (!visited.has(node)) {
+        for (const n of nodes) {
+            if (!visited.has(n) && !cycleDetected) {
                 frames.push({
-                    type: 'START_DFS',
-                    node: node,
-                    text: `Node ${labels.get(node)} is unvisited. Starting DFS from it.`,
-                    stack: [...stack],
-                    visited: Array.from(visited),
-                    visiting: Array.from(visiting)
+                    type: 'START_DFS', node: n,
+                    text: `${labels.get(n)} is unvisited — starting DFS from it.`,
+                    stack: [...stack], visited: [...visited], visiting: [...visiting]
                 });
-                dfs(node);
+                dfs(n);
             }
         }
 
         if (!cycleDetected) {
-            // Need to reverse stack for final topological order
+            // Reverse stack = topological order
+            const topo = [...stack].reverse();
             frames.push({
                 type: 'DONE',
-                text: `DFS completed! To get the final topological order, we pop items from the stack (Reverse output).`,
-                stack: [...stack].reverse(), // Store reversed essentially for display logic in UI
-                visited: Array.from(visited),
-                visiting: []
+                text: `✅ Done! Topological order (stack reversed): ${topo.map(n => labels.get(n)).join(' → ')}`,
+                stack: topo, visited: [...visited], visiting: []
             });
         }
-
         return frames;
     }
 }
 
-window.Algorithms = Algorithms;
-
+/* =====================================================================
+   ANIMATOR
+   ===================================================================== */
 class Animator {
-    constructor(graph, dsContainerTitle, dsElementsRow, resultElementsRow, explanationText) {
-        this.graph = graph;
-        this.dsContainerTitle = dsContainerTitle;
-        this.dsElements = dsElementsRow;
-        this.resultElements = resultElementsRow;
-        this.explanationText = explanationText;
-        
-        this.frames = [];
-        this.currentFrameIndex = 0;
-        this.timer = null;
-        this.isPlaying = false;
-        
-        this.speed = 1000; // ms per frame
-        this.algorithm = 'kahn'; // kahn | dfs
+    constructor(graph) {
+        this.graph         = graph;
+        this.dsTitle       = document.getElementById('ds-title');
+        this.dsElements    = document.getElementById('ds-elements');
+        this.resultElements = document.getElementById('result-elements');
+        this.explanation   = document.getElementById('step-explanation');
+
+        this.frames   = [];
+        this.frameIdx = 0;
+        this.timer    = null;
+        this.playing  = false;
+        this.speed    = 1000;
+        this.algo     = 'kahn';
     }
 
-    loadFrames(frames, algorithm) {
+    load(frames, algo) {
         this.stop();
-        this.frames = frames;
-        this.currentFrameIndex = 0;
-        this.algorithm = algorithm;
-        
-        // Reset visual state
-        this.resetVisuals();
-        
-        // Initial setup for UI panels
-        if (algorithm === 'kahn') {
-            this.dsContainerTitle.textContent = "Queue";
-        } else {
-            this.dsContainerTitle.textContent = "Stack (reversed for Topo Sort)";
-        }
-        
-        this.dsElements.innerHTML = '';
+        this.frames   = frames;
+        this.frameIdx = 0;
+        this.algo     = algo;
+        this._resetVisuals();
+        this.dsTitle.textContent = algo === 'kahn' ? 'Queue' : 'Stack';
+        this.dsElements.innerHTML    = '';
         this.resultElements.innerHTML = '';
-        this.explanationText.textContent = "Simulation loaded. Press play to start.";
+        this.explanation.textContent  = 'Loaded. Press ▶ or use step forward.';
     }
 
-    resetVisuals() {
-        this.graph.nodes.forEach(node => {
-            node.element.className = 'node'; // reset to default
+    _resetVisuals() {
+        // FIX: fully reset all node classes and in-degree labels
+        this.graph.nodes.forEach((node, id) => {
+            node.element.className = 'node';
+            node.inDegreeElement.textContent = this.graph.inDegree.get(id) ?? 0;
         });
         this.graph.edges.forEach(edge => {
-            edge.element.className.baseVal = ''; // SVG class reset
+            edge.element.className.baseVal = '';
+            edge.element.setAttribute('marker-end', 'url(#arrowhead)');
         });
     }
 
     play() {
-        if (!this.frames || this.frames.length === 0) return;
-        if (this.currentFrameIndex >= this.frames.length) {
-            this.currentFrameIndex = 0; // Loop or just do nothing? Reset for now.
-             this.resetVisuals();
+        if (!this.frames.length) return;
+        if (this.frameIdx >= this.frames.length) {
+            // Restart from beginning
+            this.frameIdx = 0;
+            this._resetVisuals();
+            this.dsElements.innerHTML = '';
+            this.resultElements.innerHTML = '';
         }
-        
-        this.isPlaying = true;
-        this.step(); // Immediate execution of first frame
-        this.timer = setInterval(() => this.step(), this.speed);
+        this.playing = true;
+        this._tick();
+        this.timer = setInterval(() => this._tick(), this.speed);
     }
 
-    pause() {
-        this.isPlaying = false;
+    stop() {
+        this.playing = false;
         clearInterval(this.timer);
+        this.timer = null;
     }
 
-    setSpeed(value) {
-        // Value comes from slider (0 to 100)
-        // 100 -> fastest (100ms), 1 -> slowest (2000ms)
-        this.speed = Math.max(100, 2000 - (value * 19));
-        if (this.isPlaying) {
-            this.pause();
-            this.play();
-        }
-    }
+    pause() { this.stop(); }
 
     stepForward() {
-        this.pause();
-        this.step();
+        this.stop();
+        this._tick();
     }
 
-    step() {
-        if (this.currentFrameIndex >= this.frames.length) {
-            this.pause();
-            // Dispatch event for UI to reset play button
-            document.dispatchEvent(new Event('simulation-ended'));
+    setSpeed(sliderVal) {
+        // slider 1-100; speed 2000ms (slow) → 100ms (fast)
+        this.speed = Math.max(100, 2100 - sliderVal * 20);
+        if (this.playing) { this.stop(); this.play(); }
+    }
+
+    _tick() {
+        if (this.frameIdx >= this.frames.length) {
+            this.stop();
+            document.dispatchEvent(new Event('sim-ended'));
             return;
         }
-
-        const frame = this.frames[this.currentFrameIndex];
-        this.renderFrame(frame);
-        this.currentFrameIndex++;
+        this._render(this.frames[this.frameIdx++]);
     }
 
-    renderFrame(frame) {
-        // 1. Text explanation
-        this.explanationText.innerHTML = frame.text;
-        
-        // 2. Data Structure rendering
+    _render(frame) {
+        this.explanation.innerHTML = frame.text;
+
+        /* --- Data structure panel --- */
         this.dsElements.innerHTML = '';
-        const listToRender = this.algorithm === 'kahn' ? (frame.queue || []) : (frame.stack || []);
-        
-        listToRender.forEach(id => {
+        const list = this.algo === 'kahn' ? (frame.queue || []) : (frame.stack || []);
+        list.forEach(id => {
             const el = document.createElement('div');
             el.className = 'ds-node';
-            el.textContent = this.graph.nodes.get(id).label;
+            el.textContent = this.graph.nodes.get(id)?.label ?? id;
             this.dsElements.appendChild(el);
         });
 
-        // Result rendering (for Kahn's mainly, DFS does stack reverse at end)
-        if (this.algorithm === 'kahn' && frame.result) {
+        /* --- Result panel (Kahn's: incremental; DFS: only on DONE) --- */
+        if (this.algo === 'kahn' && frame.result) {
             this.resultElements.innerHTML = '';
             frame.result.forEach(id => {
-                 const el = document.createElement('div');
+                const el = document.createElement('div');
                 el.className = 'ds-node visited';
-                el.textContent = this.graph.nodes.get(id).label;
+                el.textContent = this.graph.nodes.get(id)?.label ?? id;
                 this.resultElements.appendChild(el);
             });
         }
-        if (this.algorithm === 'dfs' && frame.type === 'DONE') {
-             this.resultElements.innerHTML = '';
-             frame.stack.forEach(id => {
-                 const el = document.createElement('div');
+        if (this.algo === 'dfs' && frame.type === 'DONE') {
+            this.resultElements.innerHTML = '';
+            (frame.stack || []).forEach(id => {
+                const el = document.createElement('div');
                 el.className = 'ds-node visited';
-                el.textContent = this.graph.nodes.get(id).label;
+                el.textContent = this.graph.nodes.get(id)?.label ?? id;
                 this.resultElements.appendChild(el);
             });
         }
 
-        // 3. Graph Visual State Rendering
-        // Ensure to clear old volatile classes but keep permanently changed ones
-        // In a frame-based approach, it's safer to re-calculate classes based on arrays in frame if possible, 
-        // but we'll apply them sequentially here for animation.
-        
-        // Let's reset active/highlight states, but keep visited logic
-        this.resetHighlights();
+        /* --- Graph visuals --- */
+        this._clearHighlights();
 
-        if (this.algorithm === 'kahn') {
-            this.renderKahnVisuals(frame);
-        } else {
-            this.renderDFSVisuals(frame);
-        }
-        
+        if (this.algo === 'kahn') this._renderKahn(frame);
+        else                       this._renderDFS(frame);
+
         if (frame.type === 'CYCLE_ERROR') {
-             frame.nodes.forEach(id => {
-                this.graph.nodes.get(id).element.classList.add('error');
+            (frame.nodes || []).forEach(id => {
+                this.graph.nodes.get(id)?.element.classList.add('error');
+            });
+        }
+        if (frame.type === 'DONE') {
+            // Mark all result nodes as visited
+            const finalList = this.algo === 'kahn' ? (frame.result || []) : (frame.stack || []);
+            finalList.forEach(id => {
+                this.graph.nodes.get(id)?.element.classList.add('visited');
             });
         }
     }
 
-    resetHighlights() {
-        this.graph.nodes.forEach(node => {
-            node.element.classList.remove('active', 'highlight-target');
+    _clearHighlights() {
+        this.graph.nodes.forEach(n => {
+            n.element.classList.remove('active', 'highlight-target', 'error');
         });
-        this.graph.edges.forEach(edge => {
-            edge.element.classList.remove('active');
+        this.graph.edges.forEach(e => {
+            e.element.classList.remove('active');
+            e.element.setAttribute('marker-end', 'url(#arrowhead)');
         });
     }
 
-    renderKahnVisuals(frame) {
-        // Update in-degrees text dynamically
+    _renderKahn(frame) {
+        // Update in-degree badges
         if (frame.inDegrees) {
             frame.inDegrees.forEach((val, id) => {
-                this.graph.nodes.get(id).inDegreeElement.textContent = val;
+                const node = this.graph.nodes.get(id);
+                if (node) node.inDegreeElement.textContent = val;
             });
         }
-
-        // Color logic
+        // Mark already-processed nodes green
         if (frame.result) {
-            // Already processed nodes become green
             frame.result.forEach(id => {
-                this.graph.nodes.get(id).element.classList.add('visited');
+                this.graph.nodes.get(id)?.element.classList.add('visited');
             });
         }
-        
         if (frame.type === 'PROCESS_NODE') {
-           this.graph.nodes.get(frame.node).element.classList.add('active');
+            this.graph.nodes.get(frame.node)?.element.classList.add('active');
         }
-        
         if (frame.type === 'DECREMENT_EDGE') {
-            this.graph.nodes.get(frame.source).element.classList.add('active');
-            this.graph.nodes.get(frame.target).element.classList.add('highlight-target');
-            
-            // Find edge and animate it
+            this.graph.nodes.get(frame.source)?.element.classList.add('active');
+            this.graph.nodes.get(frame.target)?.element.classList.add('highlight-target');
             const edge = this.graph.edges.find(e => e.source === frame.source && e.target === frame.target);
             if (edge) {
-                 // Change marker and stroke
-                 edge.element.setAttribute('marker-end', 'url(#arrowhead-active)');
-                 edge.element.classList.add('active');
-                 
-                 // Reset marker after animation frame (managed on next render roughly)
+                edge.element.classList.add('active');
+                edge.element.setAttribute('marker-end', 'url(#arrowhead-active)');
             }
-        } else if (frame.type !== 'CYCLE_ERROR'){
-             // reset markers to default
-             this.graph.edges.forEach(edge => {
-                 edge.element.setAttribute('marker-end', 'url(#arrowhead)');
-             });
         }
-        
         if (frame.type === 'ENQUEUE') {
-             this.graph.nodes.get(frame.node).element.classList.add('highlight-target');
-             // pop animation 
-             this.graph.nodes.get(frame.node).element.style.animation = 'none';
-             setTimeout(() => {
-                  this.graph.nodes.get(frame.node).element.style.animation = 'popIn 0.3s ease-out';
-             }, 10);
+            this.graph.nodes.get(frame.node)?.element.classList.add('highlight-target');
         }
     }
 
-    renderDFSVisuals(frame) {
-        if (frame.visited) {
-            frame.visited.forEach(id => {
-                this.graph.nodes.get(id).element.classList.add('visited');
-            });
-        }
-        if (frame.visiting) {
-             frame.visiting.forEach(id => {
-                this.graph.nodes.get(id).element.classList.add('active');
-            });
-        }
-        
+    _renderDFS(frame) {
+        (frame.visited  || []).forEach(id => this.graph.nodes.get(id)?.element.classList.add('visited'));
+        (frame.visiting || []).forEach(id => this.graph.nodes.get(id)?.element.classList.add('active'));
         if (frame.type === 'CHECK_EDGE') {
-             const edge = this.graph.edges.find(e => e.source === frame.source && e.target === frame.target);
-             if (edge) edge.element.classList.add('active');
+            const edge = this.graph.edges.find(e => e.source === frame.source && e.target === frame.target);
+            if (edge) {
+                edge.element.classList.add('active');
+                edge.element.setAttribute('marker-end', 'url(#arrowhead-active)');
+            }
         }
-        
         if (frame.type === 'PUSH_STACK') {
-             // Let it be green since it's visited, pop animation
-              this.graph.nodes.get(frame.node).element.classList.remove('active');
-              this.graph.nodes.get(frame.node).element.classList.add('visited');
+            const n = this.graph.nodes.get(frame.node);
+            if (n) { n.element.classList.remove('active'); n.element.classList.add('visited'); }
         }
     }
 }
 
-window.Animator = Animator;
+/* =====================================================================
+   APP BOOTSTRAP
+   ===================================================================== */
+let toastTimer = null;
+function showToast(msg, type = 'info') {
+    const tc = document.getElementById('toast-container');
+    const t  = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
-    const btnAddNode = document.getElementById('btn-add-node');
-    const btnAddEdge = document.getElementById('btn-add-edge');
-    const btnGenerateDAG = document.getElementById('btn-generate-dag');
-    const btnClearGraph = document.getElementById('btn-clear-graph');
-    
-    const btnPlay = document.getElementById('btn-play');
-    const btnPause = document.getElementById('btn-pause');
-    const btnStep = document.getElementById('btn-step');
-    const btnReset = document.getElementById('btn-reset');
-    
-    const speedSlider = document.getElementById('speed-slider');
-    const radioAlgorithm = document.getElementsByName('algorithm');
-    const themeToggle = document.getElementById('theme-toggle');
-    const canvasEl = document.getElementById('graph-canvas');
-    const toastContainer = document.getElementById('toast-container');
+    const graph    = new Graph();
+    const animator = new Animator(graph);
 
-    // Dependencies
-    const graph = new window.Graph();
-    const animator = new window.Animator(
-        graph,
-        document.getElementById('ds-title'),
-        document.getElementById('ds-elements'),
-        document.getElementById('result-elements'),
-        document.getElementById('step-explanation')
-    );
+    const btnAddNode     = document.getElementById('btn-add-node');
+    const btnAddEdge     = document.getElementById('btn-add-edge');
+    const btnGenerate    = document.getElementById('btn-generate-dag');
+    const btnClear       = document.getElementById('btn-clear-graph');
+    const btnPlay        = document.getElementById('btn-play');
+    const btnPause       = document.getElementById('btn-pause');
+    const btnStep        = document.getElementById('btn-step');
+    const btnReset       = document.getElementById('btn-reset');
+    const speedSlider    = document.getElementById('speed-slider');
+    const themeToggle    = document.getElementById('theme-toggle');
+    const canvas         = document.getElementById('graph-canvas');
 
-    let isSimulationRunning = false;
-    let isAddEdgeMode = false;
-    
-    // --- Helper ---
-    function showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.textContent = message;
-        toastContainer.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+    let simRunning   = false;
+    let edgeMode     = false;
+
+    /* ---- helpers ---- */
+    function setEditControls(disabled) {
+        [btnAddNode, btnAddEdge, btnGenerate, btnClear].forEach(b => b.disabled = disabled);
     }
-
+    function setSimRunning(val) {
+        simRunning = val;
+        graph.readonly = val;
+        setEditControls(val);
+        if (val && edgeMode) toggleEdgeMode();
+    }
     function toggleEdgeMode() {
-        if (isSimulationRunning) return;
-        isAddEdgeMode = !isAddEdgeMode;
-        if (isAddEdgeMode) {
+        edgeMode = !edgeMode;
+        if (edgeMode) {
             btnAddEdge.classList.add('active');
-            canvasEl.classList.add('add-edge-mode');
-            showToast("Click a source node, then a target node to connect.", "success");
+            canvas.classList.add('add-edge-mode');
+            showToast('Click a source node, then a target node.', 'success');
         } else {
             btnAddEdge.classList.remove('active');
-            canvasEl.classList.remove('add-edge-mode');
+            canvas.classList.remove('add-edge-mode');
         }
-        graph.setEdgeMode(isAddEdgeMode);
-    }
-    
-    function setSimulationState(running) {
-        isSimulationRunning = running;
-        graph.readonly = running;
-        
-        // Disable edit controls
-        btnAddNode.disabled = running;
-        btnAddEdge.disabled = running;
-        btnGenerateDAG.disabled = running;
-        btnClearGraph.disabled = running;
-        
-        if (running && isAddEdgeMode) {
-             toggleEdgeMode(); // safe exit
-        }
+        graph.setEdgeMode(edgeMode);
     }
 
-    // --- Graph Editing Interactions ---
+    function getSelectedAlgo() {
+        return [...document.getElementsByName('algorithm')].find(r => r.checked)?.value ?? 'kahn';
+    }
 
+    function prepareSimulation() {
+        const state  = graph.getGraphState();
+        if (state.nodes.length === 0) { showToast('Add some nodes first!', 'error'); return false; }
+        const frames = getSelectedAlgo() === 'kahn'
+            ? Algorithms.runKahns(state)
+            : Algorithms.runDFS(state);
+        animator.load(frames, getSelectedAlgo());
+        setSimRunning(true);
+        return true;
+    }
+
+    /* ---- graph controls ---- */
     btnAddNode.addEventListener('click', () => {
-        if (isSimulationRunning) return;
-        // Turn off edge mode if on
-        if (isAddEdgeMode) toggleEdgeMode();
-        
-        canvasEl.classList.add('add-node-mode');
-        
-        // One time click on canvas to add node
-        const addFn = (e) => {
-            const rect = canvasEl.getBoundingClientRect();
-            // Need to handle if they clicked a node instead of empty canvas
-            if (e.target.classList.contains('node')) {
-                canvasEl.classList.remove('add-node-mode');
-                canvasEl.removeEventListener('click', addFn);
-                return;
-            }
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            graph.addNode(x, y);
-            
-            canvasEl.classList.remove('add-node-mode');
-            canvasEl.removeEventListener('click', addFn);
+        if (simRunning) return;
+        if (edgeMode) toggleEdgeMode();
+        canvas.classList.add('add-node-mode');
+        showToast('Click on the canvas to place a node.');
+
+        const handler = (e) => {
+            if (e.target.classList.contains('node')) { cleanup(); return; }
+            const r = canvas.getBoundingClientRect();
+            graph.addNode(e.clientX - r.left, e.clientY - r.top);
+            cleanup();
         };
-        // Use timeout to avoid immediate trigger if btn is inside container
-        setTimeout(() => canvasEl.addEventListener('click', addFn), 50);
-        showToast("Click anywhere on the canvas to place node");
+        const cleanup = () => {
+            canvas.classList.remove('add-node-mode');
+            canvas.removeEventListener('click', handler);
+        };
+        setTimeout(() => canvas.addEventListener('click', handler), 80);
     });
 
-    btnAddEdge.addEventListener('click', toggleEdgeMode);
+    btnAddEdge.addEventListener('click', () => { if (!simRunning) toggleEdgeMode(); });
 
-    btnGenerateDAG.addEventListener('click', () => {
-        if (isSimulationRunning) return;
-        graph.generateRandomDAG(Math.floor(Math.random() * 5) + 6); // 6 to 10 nodes
-        animator.resetVisuals();
-        showToast("Random DAG Generated.");
+    btnGenerate.addEventListener('click', () => {
+        if (simRunning) return;
+        graph.generateRandomDAG(Math.floor(Math.random() * 4) + 5);
+        animator._resetVisuals?.();
+        showToast('Random DAG generated!', 'success');
     });
 
-    btnClearGraph.addEventListener('click', () => {
-        if (isSimulationRunning) return;
+    btnClear.addEventListener('click', () => {
+        if (simRunning) return;
         graph.clear();
-        animator.resetVisuals();
+        document.getElementById('ds-elements').innerHTML    = '';
+        document.getElementById('result-elements').innerHTML = '';
+        document.getElementById('step-explanation').textContent = 'Graph cleared. Build a new one!';
     });
 
-    // --- Simulation Controls ---
-
-    function setupSimulationData() {
-        // Find which algo is selected
-        let selectedAlgo = 'kahn';
-        radioAlgorithm.forEach(r => { if(r.checked) selectedAlgo = r.value; });
-        
-        const state = graph.getGraphState();
-        let frames = [];
-        
-        if (selectedAlgo === 'kahn') {
-            frames = window.Algorithms.runKahns(state);
-        } else {
-            frames = window.Algorithms.runDFS(state);
-        }
-        
-        animator.loadFrames(frames, selectedAlgo);
-        setSimulationState(true);
-    }
-
+    /* ---- playback ---- */
     btnPlay.addEventListener('click', () => {
-        if (!isSimulationRunning) {
-            setupSimulationData();
-        }
+        if (!simRunning && !prepareSimulation()) return;
         animator.play();
         btnPlay.classList.add('hidden');
         btnPause.classList.remove('hidden');
@@ -1592,56 +1201,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnStep.addEventListener('click', () => {
-        if (!isSimulationRunning) {
-            setupSimulationData();
-        }
+        if (!simRunning && !prepareSimulation()) return;
         animator.stepForward();
-        // Pause visually if was playing
-        if (animator.isPlaying) {
-             btnPause.classList.add('hidden');
-             btnPlay.classList.remove('hidden');
-        }
+        // If it was auto-playing, stop visual indicator
+        btnPause.classList.add('hidden');
+        btnPlay.classList.remove('hidden');
     });
 
     btnReset.addEventListener('click', () => {
-        animator.pause();
-        animator.loadFrames([], 'kahn'); // Clear
-        graph.updateNodeDisplays(); // Restore original in-degrees visually
-        setSimulationState(false);
-        
+        animator.stop();
+        setSimRunning(false);
+        animator._resetVisuals();
+        document.getElementById('ds-elements').innerHTML    = '';
+        document.getElementById('result-elements').innerHTML = '';
+        document.getElementById('step-explanation').textContent = 'Reset. You can edit the graph or run again.';
         btnPause.classList.add('hidden');
         btnPlay.classList.remove('hidden');
-        
-        document.getElementById('step-explanation').textContent = "Simulation reset. You can edit the graph again.";
+        btnPlay.disabled = false;
     });
 
-    document.addEventListener('simulation-ended', () => {
+    // FIX: simulation-ended → just flip button, don't permanently disable play
+    document.addEventListener('sim-ended', () => {
         btnPause.classList.add('hidden');
         btnPlay.classList.remove('hidden');
-        btnPlay.disabled = true; // Can't play anymore
-        setTimeout(() => btnPlay.disabled = false, 500); // Debounce
+        btnPlay.disabled = false;
     });
 
-    speedSlider.addEventListener('input', (e) => {
-        animator.setSpeed(parseInt(e.target.value));
-    });
+    speedSlider.addEventListener('input', e => animator.setSpeed(+e.target.value));
 
-    // --- Theme Control ---
+    /* ---- theme ---- */
     themeToggle.addEventListener('click', () => {
         const html = document.documentElement;
-        if (html.getAttribute('data-theme') === 'dark') {
-            html.setAttribute('data-theme', 'light');
-            themeToggle.innerHTML = '<ion-icon name="sunny-outline"></ion-icon>';
-        } else {
-            html.setAttribute('data-theme', 'dark');
-            themeToggle.innerHTML = '<ion-icon name="moon-outline"></ion-icon>';
-        }
+        const dark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', dark ? 'light' : 'dark');
+        themeToggle.innerHTML = dark
+            ? '<ion-icon name="sunny-outline"></ion-icon>'
+            : '<ion-icon name="moon-outline"></ion-icon>';
     });
 
-    // Initial setup
-    graph.generateRandomDAG(5);
-    showToast("Welcome! Try Kahn's or DFS sorting algorithms.");
+    /* ---- initial state ---- */
+    graph.generateRandomDAG(6);
+    showToast('Welcome! Generate a graph and press ▶', 'success');
 });
-    </script>
+</script>
 </body>
 </html>
